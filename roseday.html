@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rose Day Announcement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #ffb6c1, #ffe4e1); /* Softer gradient background */
+      overflow: hidden;
+      font-family: 'Playfair Display', serif; /* Elegant serif font */
+    }
+    #announcementCanvas {
+      border-radius: 15px; /* Rounded corners for canvas */
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Shadow for canvas */
+    }
+  </style>
+</head>
+<body>
+  <canvas id="announcementCanvas" width="600" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("announcementCanvas");
+    const ctx = canvas.getContext("2d");
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Gradient background setup
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, "#ffb6c1");
+    gradient.addColorStop(1, "#ffe4e1");
+
+    // Heart properties
+    const hearts = [];
+    function createHeart() {
+      const size = Math.random() * 20 + 10;
+      hearts.push({
+        x: Math.random() * width,
+        y: height + size,
+        size: size,
+        speed: Math.random() * 1.5 + 0.5,
+        opacity: Math.random() * 0.5 + 0.5,
+        angle: Math.random() * 360
+      });
+    }
+
+    // Function to draw heart shape using Bezier curves
+    function drawHeart(x, y, size) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.bezierCurveTo(x - size / 2, y - size / 2, x - size, y + size / 3, x, y + size);
+      ctx.bezierCurveTo(x + size, y + size / 3, x + size / 2, y - size / 2, x, y);
+      ctx.fill();
+    }
+
+    function drawHearts() {
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw floating hearts
+      for (let i = 0; i < hearts.length; i++) {
+        const heart = hearts[i];
+        ctx.globalAlpha = heart.opacity;
+        ctx.fillStyle = "#ff6b81"; // Soft pink-red heart color
+        ctx.save();
+        ctx.translate(heart.x, heart.y);
+        ctx.rotate((heart.angle += 0.01)); // Rotate hearts slightly for effect
+        drawHeart(0, 0, heart.size); // Draw actual heart shape
+        ctx.restore();
+        heart.y -= heart.speed;
+
+        if (heart.y < -heart.size) {
+          hearts.splice(i, 1);
+          i--;
+        }
+      }
+      ctx.globalAlpha = 1.0; // Reset opacity
+    }
+
+    // Glowing Text Animation
+    let glowOffset = 0;
+    function drawText() {
+      ctx.font = "bold 40px 'Playfair Display', serif";
+      ctx.textAlign = "center";
+
+      // Glowing effect
+      ctx.shadowColor = "#ff1493"; // Deep pink glow
+      ctx.shadowBlur = 30 + Math.sin(glowOffset) * 15;
+      glowOffset += 0.1;
+
+      // Draw main and sub text with updated colors
+      ctx.fillStyle = "#8b0000"; // Dark red text color
+      ctx.fillText("Rose Day on 3rd December", width / 2, height / 2 - 20);
+      ctx.font = "22px 'Playfair Display', serif";
+      ctx.fillStyle = "#6a0dad"; // Soft purple for the subtext
+      ctx.fillText("See you there! Buy your rose cards ASAP!", width / 2, height / 2 + 40);
+    }
+
+    // Animation Loop
+    function animate() {
+      drawHearts();
+      drawText();
+      requestAnimationFrame(animate);
+    }
+
+    // Create hearts at intervals
+    setInterval(createHeart, 150);
+
+    // Start the animation
+    animate();
+
+    // Set initial canvas size based on screen dimensions
+  function resizeCanvas() {
+    canvas.width = window.innerWidth * 0.9; // 90% of viewport width
+    canvas.height = window.innerHeight * 0.6; // 60% of viewport height
+  }
+
+  resizeCanvas(); // Initial call
+
+  // Adjust canvas size on window resize
+  window.addEventListener("resize", resizeCanvas);
+  </script>
+</body>
+</html>
